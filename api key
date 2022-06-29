@@ -1,0 +1,64 @@
+code: normal .py file
+-----------------------
+from cryptography.fernet import Fernet
+key = Fernet.generate_key()
+cipher_suite = Fernet(key)
+
+print(cipher_suite)
+name = bytes('CHALLENGE', 'utf-8')
+encoded_text = cipher_suite.encrypt(name)
+print(encoded_text)
+
+
+note:
+--------
+import cryptography package
+CHALLENGE - give name of your project
+and run this code in normal .py file
+
+
+
+code: permission.py - utils app
+-----------------------------------
+from django.conf import settings
+from rest_framework import permissions
+from rest_framework.exceptions import ParseError
+
+
+class CheckAPIKEYAuth(permissions.BasePermission):
+    """
+    This permission class is used for check api key and identify the requests.
+    """
+    def has_permission(self, request, view):
+        # API_KEY should be in request headers to authenticate requests
+        api_key_secret = request.META.get("HTTP_API_KEY")
+        try:
+            api_key_secret = bytes(api_key_secret, 'utf-8')
+        except TypeError:
+            raise ParseError("API key is required.")
+        if api_key_secret == settings.API_KEY_SECRET:
+            return True
+        else:
+            raise ParseError("Invalid API key !!")
+            
+            
+            
+note:
+--------------
+paste this code in permissions.py in utils app
+add in permission_class in viewset
+like this :- permission_classes = (permissions.IsAuthenticated, CheckAPIKEYAuth)
+
+
+code: settings.py
+-------------------
+# API KEY
+API_KEY_SECRET = bytes(
+    "gAAAAABhgS1vcgBOzR1CTtUoCM0_5ioBTduPrppjr2sWwFgXZkHLL8JkRUmUus2EaGFoKiN2zGNWa8ThAra59P0GbeROqrgYKQ", "utf-8")
+    
+    
+
+note:
+---------
+gAAAAABhgS1vcgBOzR1CTtUoCM0_5ioBTduPrppjr2sWwFgXZkHLL8JkRUmUus2EaGFoKiN2zGNWa8ThAra59P0GbeROqrgYKQ - this is encoded_text
+paste this code in settings.py
